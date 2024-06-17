@@ -1,11 +1,11 @@
 import Image from "next/image";
+// import { Leaderboard } from "s./components/OldLeaderboard";
 import { Leaderboard } from "./components/Leaderboard";
 
 export default function Home() {
   return (
     <div className="mx-20">
-      {/* Leaderboard Heading with description centered */}
-      <div className="flex flex-col items-center justify-center mb-10">
+      <div className="flex flex-col items-center justify-center mb-4">
         <h1 className="text-4xl font-bold text-center">
           Machine Learning Model Leaderboard
         </h1>
