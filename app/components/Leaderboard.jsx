@@ -20,16 +20,6 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -41,6 +31,8 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import Link from "next/link";
+
+import { DropdownMenuCheckboxes } from "./DropdownMenu";
 
 const data = [
   {
@@ -255,7 +247,7 @@ export function Leaderboard() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-center py-4 mb-4">
+      <div className="flex items-center justify-center py-4 mb-4 gap-3">
         <Input
           placeholder="Search your favorite model..."
           value={table.getColumn("name")?.getFilterValue() ?? ""}
@@ -264,6 +256,7 @@ export function Leaderboard() {
           }
           className="max-w-sm"
         />
+        <DropdownMenuCheckboxes />
       </div>
       <div className="rounded-md border bg-[#fffaeb] shadow-lg overflow-hidden mb-3">
         <Table>
