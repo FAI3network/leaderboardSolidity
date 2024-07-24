@@ -118,7 +118,8 @@ export default function Component() {
         <div className="text-center">
           <h1 className="text-4xl font-bold pb-3">{modelURI.name}</h1>
           <h3>
-            Get a detailed overview of the model's architecture and performance.
+            Get a detailed overview of the model`&apos;`s architecture and
+            performance.
           </h3>
         </div>
         <div className="grid gap-8 lg:grid-cols-[2fr_2fr] h-[500px]">
