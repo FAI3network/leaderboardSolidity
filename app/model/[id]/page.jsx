@@ -18,6 +18,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -27,19 +28,9 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-// import {
-//   CartesianGrid,
-//   XAxis,
-//   Line,
-//   LineChart,
-//   Area,
-//   AreaChart,
-// } from "recharts";
-import {
-  ChartTooltipContent,
-  ChartTooltip,
-  ChartContainer,
-} from "@/components/ui/chart";
+import BarChartchart from "@/app/components/charts/BarChartchart";
+import LineChartchart from "@/app/components/charts/LineChartchart";
+import { TabChart } from "@/app/components/charts/TabChart";
 
 export default function Component() {
   const modelURI = {
@@ -63,6 +54,64 @@ export default function Component() {
     created_by: "FinanceMLCo",
     date_created: "2023-10-15",
   };
+  const chartData = [
+    { timestamp: "2024-07-01", SPD: 0.51, DI: 1.1, AOD: 0.45, EOD: 0.61 },
+    { timestamp: "2024-07-02", SPD: 0.37, DI: 1.0, AOD: 0.33, EOD: 0.43 },
+    { timestamp: "2024-07-03", SPD: -0.1, DI: 0.8, AOD: -0.17, EOD: 0.1 },
+    // Add more data as needed
+  ];
+
+  const chartConfig = {
+    SPD: {
+      label: "Statistical Parity Difference",
+      color: "#2563eb",
+      description:
+        "The statistical parity difference measures the difference in the positive outcome rates between the unprivileged group and the privileged group.",
+      footer: {
+        unfair: "SPD significantly different from 0 (e.g., -0.4 or 0.4)",
+        fair: "SPD close to 0 (e.g., -0.1 to 0.1)",
+      },
+      fairRange: [-0.1, 0.1],
+      unfairRange: [-0.4, 0.4],
+    },
+    DI: {
+      label: "Disparate Impact",
+      color: "#60a5fa",
+      description:
+        "Disparate impact compares the ratio of the positive outcome rates between the unprivileged group and the privileged group.",
+      footer: {
+        unfair:
+          "DI significantly different from 1 (e.g., less than 0.8 or greater than 1.25)",
+        fair: "DI close to 1 (e.g., 0.8 to 1.25)",
+      },
+      fairRange: [0.8, 1.25],
+      unfairRange: [0.8, 1.25],
+    },
+    AOD: {
+      label: "Average Odds Difference",
+      color: "#10b981",
+      description:
+        "The average odds difference measures the difference in false positive rates and true positive rates between the unprivileged group and the privileged group.",
+      footer: {
+        fair: "AOD close to 0 (e.g., -0.1 to 0.1)",
+        unfair: "AOD significantly different from 0 (e.g., -0.2 or 0.2)",
+      },
+      fairRange: [-0.1, 0.1],
+      unfairRange: [-0.2, 0.2],
+    },
+    EOD: {
+      label: "Equal Opportunity Difference",
+      color: "#f97316",
+      description:
+        "The equal opportunity difference measures the difference in true positive rates between the unprivileged group and the privileged group.",
+      footer: {
+        fair: "EOD close to 0 (e.g., -0.1 to 0.1)",
+        unfair: "EOD significantly different from 0 (e.g., -0.2 or 0.2)",
+      },
+      unfairRange: [-0.2, 0.2],
+      fairRange: [-0.1, 0.1],
+    },
+  };
   return (
     <div className="grid min-h-screen w-full bg-white">
       <section className="grid gap-8 p-6 md:p-10">
@@ -72,8 +121,8 @@ export default function Component() {
             Get a detailed overview of the model's architecture and performance.
           </h3>
         </div>
-        <div className="grid gap-8 lg:grid-cols-[2fr_2fr]">
-          <Card className="bg-[#fffaeb] h-auto">
+        <div className="grid gap-8 lg:grid-cols-[2fr_2fr] h-[500px]">
+          <Card className="bg-[#fffaeb]">
             <CardHeader className="">
               <CardTitle>Model Details</CardTitle>
               <CardDescription className="text-md">
@@ -81,7 +130,7 @@ export default function Component() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-8 max-h-96">
-              <div className="grid gap-4 h-fit">
+              <div className="grid gap-4 h-fit text-lg">
                 <p>
                   <strong>Framework:</strong> {modelURI.framework}
                 </p>
@@ -101,108 +150,21 @@ export default function Component() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-[#fffaeb]">
-            <CardHeader>
-              <CardTitle>Model Performance Summary</CardTitle>
-              <CardDescription className="text-md">
-                Key metrics for the latest model run.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-3 gap-6 pt-10">
-              <div className="flex flex-col items-center gap-2 justify-center ">
-                <div className="text-4xl font-bold">0.92</div>
-                <div className="text-muted-foreground">Accuracy</div>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-4xl font-bold">0.88</div>
-                <div className="text-muted-foreground">Precision</div>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-4xl font-bold">0.94</div>
-                <div className="text-muted-foreground">Recall</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
-          <Card className="h-full bg-[#fffaeb]">
-            <CardHeader>
+          {/* <Card className="h-full bg-[#fffaeb]">
+            <CardHeader className="relative">
               <CardTitle>Model Metrics</CardTitle>
               <CardDescription>
                 Visualize the performance of your AI model over time.
               </CardDescription>
+              <div className="absolute top-5 right-2">
+                <Button variant="primary">View All Metrics</Button>
+              </div>
             </CardHeader>
             <CardContent>
-              {/* <LinechartChart className="aspect-[4/3]" /> */}
+              <BarChartchart chartConfig={chartConfig} chartData={chartData} />
             </CardContent>
-          </Card>
-          <Card className="bg-[#fffaeb]">
-            <CardHeader>
-              <CardTitle>Model Runs</CardTitle>
-              <CardDescription>
-                Detailed information about each model run.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Hyperparameters</TableHead>
-                    <TableHead>Accuracy</TableHead>
-                    <TableHead>Precision</TableHead>
-                    <TableHead>Recall</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>2023-06-15</TableCell>
-                    <TableCell>
-                      <div>Learning Rate: 0.001</div>
-                      <div>Batch Size: 32</div>
-                      <div>Epochs: 50</div>
-                    </TableCell>
-                    <TableCell>0.92</TableCell>
-                    <TableCell>0.88</TableCell>
-                    <TableCell>0.94</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>2023-06-10</TableCell>
-                    <TableCell>
-                      <div>Learning Rate: 0.005</div>
-                      <div>Batch Size: 64</div>
-                      <div>Epochs: 30</div>
-                    </TableCell>
-                    <TableCell>0.89</TableCell>
-                    <TableCell>0.85</TableCell>
-                    <TableCell>0.91</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>2023-06-05</TableCell>
-                    <TableCell>
-                      <div>Learning Rate: 0.01</div>
-                      <div>Batch Size: 16</div>
-                      <div>Epochs: 20</div>
-                    </TableCell>
-                    <TableCell>0.84</TableCell>
-                    <TableCell>0.82</TableCell>
-                    <TableCell>0.87</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>2023-06-01</TableCell>
-                    <TableCell>
-                      <div>Learning Rate: 0.001</div>
-                      <div>Batch Size: 32</div>
-                      <div>Epochs: 40</div>
-                    </TableCell>
-                    <TableCell>0.91</TableCell>
-                    <TableCell>0.87</TableCell>
-                    <TableCell>0.93</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          </Card> */}
+          <TabChart />
         </div>
         <Card className="bg-[#fffaeb]">
           <CardHeader>
@@ -229,131 +191,114 @@ export default function Component() {
         <div className="grid gap-8 lg:grid-cols-2">
           <Card className="bg-[#fffaeb]">
             <CardHeader>
-              <CardTitle>Model Loss</CardTitle>
-              <CardDescription>
-                Visualize the loss of the model during training.
-              </CardDescription>
+              <CardTitle>{chartConfig.SPD.label}</CardTitle>
+              <CardDescription>{chartConfig.SPD.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* <LinechartChart className="aspect-[4/3]" /> */}
+              <LineChartchart
+                dataKey="SPD"
+                label={chartConfig.SPD.label}
+                color={chartConfig.SPD.color}
+                chartData={chartData}
+                unfairRange={chartConfig.SPD.unfairRange}
+                maxVal={chartData.reduce(
+                  (max, p) => (p.SPD > max ? p.SPD : max),
+                  chartData[0].SPD
+                )}
+                minVal={chartData.reduce(
+                  (min, p) => (p.SPD < min ? p.SPD : min),
+                  chartData[0].SPD
+                )}
+              />
             </CardContent>
+            <CardFooter className="flex flex-col text-sm">
+              <p>Unfair outcome: {chartConfig.SPD.footer.unfair}</p>
+              <p>Fair outcome: {chartConfig.SPD.footer.unfair}</p>
+            </CardFooter>
           </Card>
           <Card className="bg-[#fffaeb]">
             <CardHeader>
-              <CardTitle>Model Confusion Matrix</CardTitle>
-              <CardDescription>
-                Understand the model's performance on different classes.
-              </CardDescription>
+              <CardTitle>{chartConfig.DI.label}</CardTitle>
+              <CardDescription>{chartConfig.DI.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* <AreachartChart className="aspect-[4/3]" /> */}
+              <LineChartchart
+                dataKey="DI"
+                label={chartConfig.DI.label}
+                color={chartConfig.DI.color}
+                chartData={chartData}
+                unfairRange={chartConfig.DI.unfairRange}
+                maxVal={chartData.reduce(
+                  (max, p) => (p.DI > max ? p.DI : max),
+                  chartData[0].DI
+                )}
+                minVal={chartData.reduce(
+                  (min, p) => (p.DI < min ? p.DI : min),
+                  chartData[0].DI
+                )}
+              />
             </CardContent>
+            <CardFooter className="flex flex-col text-sm">
+              <p>Unfair outcome: {chartConfig.DI.footer.unfair}</p>
+              <p>Fair outcome: {chartConfig.DI.footer.unfair}</p>
+            </CardFooter>
+          </Card>
+          <Card className="bg-[#fffaeb]">
+            <CardHeader>
+              <CardTitle>{chartConfig.AOD.label}</CardTitle>
+              <CardDescription>{chartConfig.AOD.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LineChartchart
+                dataKey="AOD"
+                label={chartConfig.AOD.label}
+                color={chartConfig.AOD.color}
+                chartData={chartData}
+                unfairRange={chartConfig.AOD.unfairRange}
+                maxVal={chartData.reduce(
+                  (max, p) => (p.AOD > max ? p.AOD : max),
+                  chartData[0].AOD
+                )}
+                minVal={chartData.reduce(
+                  (min, p) => (p.AOD < min ? p.AOD : min),
+                  chartData[0].AOD
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex flex-col text-sm">
+              <p>Unfair outcome: {chartConfig.AOD.footer.unfair}</p>
+              <p>Fair outcome: {chartConfig.AOD.footer.unfair}</p>
+            </CardFooter>
+          </Card>
+          <Card className="bg-[#fffaeb]">
+            <CardHeader>
+              <CardTitle>{chartConfig.EOD.label}</CardTitle>
+              <CardDescription>{chartConfig.EOD.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LineChartchart
+                dataKey="EOD"
+                label={chartConfig.EOD.label}
+                color={chartConfig.EOD.color}
+                chartData={chartData}
+                unfairRange={chartConfig.EOD.unfairRange}
+                maxVal={chartData.reduce(
+                  (max, p) => (p.EOD > max ? p.EOD : max),
+                  chartData[0].EOD
+                )}
+                minVal={chartData.reduce(
+                  (min, p) => (p.EOD < min ? p.EOD : min),
+                  chartData[0].EOD
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex flex-col text-sm ">
+              <p>Unfair outcome: {chartConfig.EOD.footer.unfair}</p>
+              <p>Fair outcome: {chartConfig.EOD.footer.unfair}</p>
+            </CardFooter>
           </Card>
         </div>
       </section>
-    </div>
-  );
-}
-
-function AreachartChart(props) {
-  return (
-    <div {...props}>
-      <ChartContainer
-        config={{
-          desktop: {
-            label: "Desktop",
-            color: "hsl(var(--chart-1))",
-          },
-        }}
-        className="min-h-[300px]"
-      >
-        <AreaChart
-          accessibilityLayer
-          data={[
-            { month: "January", desktop: 186 },
-            { month: "February", desktop: 305 },
-            { month: "March", desktop: 237 },
-            { month: "April", desktop: 73 },
-            { month: "May", desktop: 209 },
-            { month: "June", desktop: 214 },
-          ]}
-          margin={{
-            left: 12,
-            right: 12,
-          }}
-        >
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent indicator="line" />}
-          />
-          <Area
-            dataKey="desktop"
-            type="natural"
-            fill="var(--color-desktop)"
-            fillOpacity={0.4}
-            stroke="var(--color-desktop)"
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  );
-}
-
-function LinechartChart(props) {
-  return (
-    <div {...props}>
-      <ChartContainer
-        config={{
-          desktop: {
-            label: "Desktop",
-            color: "hsl(var(--chart-1))",
-          },
-        }}
-      >
-        <LineChart
-          accessibilityLayer
-          data={[
-            { month: "January", desktop: 186 },
-            { month: "February", desktop: 305 },
-            { month: "March", desktop: 237 },
-            { month: "April", desktop: 73 },
-            { month: "May", desktop: 209 },
-            { month: "June", desktop: 214 },
-          ]}
-          margin={{
-            left: 12,
-            right: 12,
-          }}
-        >
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent hideLabel />}
-          />
-          <Line
-            dataKey="desktop"
-            type="natural"
-            stroke="var(--color-desktop)"
-            strokeWidth={2}
-            dot={false}
-          />
-        </LineChart>
-      </ChartContainer>
     </div>
   );
 }
