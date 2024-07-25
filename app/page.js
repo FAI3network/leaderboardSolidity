@@ -69,7 +69,7 @@ export default function Home() {
         </p>
       </div>
       {modelsWithDetails.length === 0 ? (
-        <div>Loading...</div>
+        <div className="w-full text-center">Loading...</div>
       ) : (
         <Leaderboard models={modelsWithDetails} />
       )}

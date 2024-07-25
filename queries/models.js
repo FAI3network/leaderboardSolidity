@@ -9,5 +9,13 @@ query Top10ModelRegistereds {
   }
 }
 `;
-
-export { top10Models };
+const modelById = `
+query ModelById ($id: ID!){
+  modelRegistered(id: $id) {
+    owner
+    numberOfInferences
+    modelURI
+  }
+}
+`;
+export { top10Models, modelById };

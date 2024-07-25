@@ -18,14 +18,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-export function TabChart() {
-  const chartData = [
-    { timestamp: "2024-07-01", SPD: 0.51, DI: 1.1, AOD: 0.45, EOD: 0.61 },
-    { timestamp: "2024-07-02", SPD: 0.37, DI: 1.0, AOD: 0.33, EOD: 0.43 },
-    { timestamp: "2024-07-03", SPD: -0.1, DI: 0.8, AOD: -0.17, EOD: 0.1 },
-    // Add more data as needed
-  ];
-
+export function TabChart({ chartData }) {
   const chartConfig = {
     SPD: {
       label: "Statistical Parity Difference",
